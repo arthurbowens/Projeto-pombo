@@ -1,38 +1,31 @@
 package br.sc.senac.pombo.model.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "pruus")
+@Table(name = "denuncias")
 @Data
-public class Pruu {
+public class Denuncia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
+    @JoinColumn(name = "pruu_id")
+    private Pruu pruu;
+
+    @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    @NotBlank
-    @Max(300)
-    private String content;
-
-    @OneToMany
-    private Set<Usuario> likes;
+    private String motivo;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    private boolean bloqueado = false;
 }

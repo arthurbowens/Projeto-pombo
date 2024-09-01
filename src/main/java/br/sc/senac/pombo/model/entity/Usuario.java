@@ -1,41 +1,45 @@
 package br.sc.senac.pombo.model.entity;
 
-
-import br.sc.senac.pombo.model.enums.PerfolAcesso;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.validator.constraints.br.CPF;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.UUID;
+
 @Entity
-@Table
+@Table(name = "usuarios")
 @Data
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @UuidGenerator
-    private String id;
+    private UUID id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PerfolAcesso perfolAcesso;
+    @NotBlank
+    @Max(120)
+    private String name;
 
-
-    @Column(nullable = false)
-    private String nome;
-
+    @NotBlank
     @Email
-    @Column(nullable = false)
     private String email;
 
+    @NotBlank
     @CPF
-    @Column(nullable = false)
     private String cpf;
 
-    @Column(nullable = false)
-    private String senha;
+    @OneToMany(mappedBy = "usuario")
+    private Set<Pruu> pruus;
 
+    @Enumerated(EnumType.STRING)
+    private PerfilAcesso perfilAcesso;
 
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 }
