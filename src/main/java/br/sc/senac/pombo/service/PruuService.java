@@ -30,7 +30,7 @@ public class PruuService {
         }
 
         Pruu pruu = new Pruu();
-        pruu.setContent(content);
+        pruu.setConteudo(content);
         pruu.setUsuario(usuario);
 
         return pruuRepository.save(pruu);

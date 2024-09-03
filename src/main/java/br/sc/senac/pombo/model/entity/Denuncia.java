@@ -27,5 +27,5 @@ public class Denuncia {
     private String motivo;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDateTime dataHoraDenuncia;
 }

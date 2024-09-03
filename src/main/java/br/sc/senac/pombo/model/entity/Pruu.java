@@ -26,7 +26,7 @@ public class Pruu {
 
     @NotBlank
     @Max(300)
-    private String content;
+    private String conteudo;
 
     @OneToMany
     private Set<Usuario> likes;

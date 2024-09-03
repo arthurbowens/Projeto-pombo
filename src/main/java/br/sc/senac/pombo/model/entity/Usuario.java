@@ -41,5 +41,5 @@ public class Usuario {
     private PerfilAcesso perfilAcesso;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDateTime dataHoraCadastro;
 }
