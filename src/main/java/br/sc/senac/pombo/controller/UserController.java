@@ -29,4 +29,5 @@ public class UserController {
     public ResponseEntity<User> findById(@PathVariable String id) {
         return ResponseEntity.ok(userService.findById(id));
     }
+
 }

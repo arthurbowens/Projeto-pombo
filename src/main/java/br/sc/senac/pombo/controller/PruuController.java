@@ -26,4 +26,5 @@ public class PruuController {
     public List<Pruu> findAll() {
         return pruuService.findAll();
     }
+
 }

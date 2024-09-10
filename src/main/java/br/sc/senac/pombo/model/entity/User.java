@@ -1,6 +1,5 @@
 package br.sc.senac.pombo.model.entity;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
