@@ -1,45 +1,51 @@
 package br.sc.senac.pombo.model.entity;
 
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.validator.constraints.br.CPF;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
-@Table(name = "usuarios")
+@Table
 @Data
-public class Usuario {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @UuidGenerator
+    private String id;
+
+    @ManyToMany(mappedBy = "likes")
+    Set<Pruu> likedPruus;
 
     @NotBlank
-    @Max(120)
     private String name;
 
     @NotBlank
-    @Email
+    @Email(message = "O email deve ser válido.")
+    @Column(unique = true)
     private String email;
 
     @NotBlank
     @CPF
+    @Column(unique = true)
     private String cpf;
 
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(mappedBy = "user")
     private Set<Pruu> pruus;
 
     @Enumerated(EnumType.STRING)
-    private PerfilAcesso perfilAcesso;
+    private PerfilAcesso role = PerfilAcesso.USER; // Seta o valor default de role como USER quando nao é informado explicitamente
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 }

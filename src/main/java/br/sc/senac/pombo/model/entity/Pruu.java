@@ -1,38 +1,40 @@
 package br.sc.senac.pombo.model.entity;
 
+
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
-@Table(name = "pruus")
+@Table
 @Data
 public class Pruu {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @UuidGenerator
+    private String id;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @NotBlank
-    @Max(300)
+    @Size(max = 300, message = "O conteúdo do Pruu deve conter no máximo 300 caracteres.")
     private String content;
 
-    @OneToMany
-    private Set<Usuario> likes;
+    @ManyToMany
+    @JoinTable(name = "pruu_like", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "pruu_id"))
+    private Set<User> likes;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    private boolean bloqueado = false;
+    private LocalDate createdAt;
 }

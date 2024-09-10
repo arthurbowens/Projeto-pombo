@@ -1,14 +1,17 @@
 package br.sc.senac.pombo.service;
 
+package com.pruu.pombo.service;
+
+import br.sc.senac.pombo.exception.PomboException;
 import br.sc.senac.pombo.model.entity.Pruu;
-import br.sc.senac.pombo.model.entity.Usuario;
+import br.sc.senac.pombo.model.entity.User;
 import br.sc.senac.pombo.model.repository.PruuRepository;
-import br.sc.senac.pombo.model.repository.UsuarioRepository;
+import br.sc.senac.pombo.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -18,81 +21,46 @@ public class PruuService {
     private PruuRepository pruuRepository;
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UserRepository userRepository;
 
-    public Pruu criarPruu(String content, UUID usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+    public List<Pruu> findAll() {
+        return pruuRepository.findAll();
+    }
 
-        content = content.trim();
-        if (content.length() < 1 || content.length() > 300) {
-            throw new IllegalArgumentException("O texto deve ter entre 1 e 300 caracteres.");
-        }
+    public Pruu findById(String id) {
+        return pruuRepository.findById(id).orElse(null);
+    }
 
-        Pruu pruu = new Pruu();
-        pruu.setContent(content);
-        pruu.setUsuario(usuario);
+    //public Set<Pruu> fetchByUserId(UUID userId) {
+    //  return pruuRepository.findByUserId(userId);
+    //}
+
+    public Pruu create(Pruu pruu) throws PomboException {
+        verifyIfUserExists(pruu);
 
         return pruuRepository.save(pruu);
     }
 
-    public List<Pruu> listarTodosPruus() {
-        return pruuRepository.findAllByOrderByCreatedAtDesc();
-    }
+    public void like(UUID userId, UUID pruuId) {
+        Pruu pruu = pruuRepository.findById(pruuId.toString()).orElse(null);
+        Set<User> likes = pruu.getLikes();
+        User user = userRepository.findById(userId.toString()).orElse(null);
 
-    public List<Pruu> listarPruusPorUsuario(UUID usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-        return pruuRepository.findByUsuarioOrderByCreatedAtDesc(usuario);
-    }
-
-    public void likePruu(UUID pruuId, UUID usuarioId) {
-        Pruu pruu = pruuRepository.findById(pruuId)
-                .orElseThrow(() -> new IllegalArgumentException("Pruu não encontrado"));
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-
-        if (pruu.getLikes().contains(usuario)) {
-            throw new IllegalArgumentException("Usuário já deu like neste Pruu.");
+        if(likes.contains(user)) {
+            likes.remove(user);
+        } else {
+            likes.add(user);
         }
 
-        pruu.getLikes().add(usuario);
+        pruu.setLikes(likes);
         pruuRepository.save(pruu);
     }
 
-    public void unlikePruu(UUID pruuId, UUID usuarioId) {
-        Pruu pruu = pruuRepository.findById(pruuId)
-                .orElseThrow(() -> new IllegalArgumentException("Pruu não encontrado"));
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+    public void verifyIfUserExists(Pruu pruu) throws PomboException {
+        User user = userRepository.findById(pruu.getUser().getId()).orElse(null);
 
-        if (!pruu.getLikes().contains(usuario)) {
-            throw new IllegalArgumentException("Usuário não deu like neste Pruu.");
+        if(user == null) {
+            throw new PomboException("Usuário não existente.");
         }
-
-        pruu.getLikes().remove(usuario);
-        pruuRepository.save(pruu);
-    }
-
-    public Optional<Pruu> listarPruuPorId(UUID id) {
-        return pruuRepository.findById(id);
-    }
-
-    public void bloquearPruu(UUID pruuId) {
-        Pruu pruu = pruuRepository.findById(pruuId)
-                .orElseThrow(() -> new IllegalArgumentException("Pruu não encontrado"));
-        pruu.setBloqueado(true);
-        pruuRepository.save(pruu);
-    }
-
-    public void desbloquearPruu(UUID pruuId) {
-        Pruu pruu = pruuRepository.findById(pruuId)
-                .orElseThrow(() -> new IllegalArgumentException("Pruu não encontrado"));
-        pruu.setBloqueado(false);
-        pruuRepository.save(pruu);
-    }
-
-    public void excluirPruu(UUID id) {
-        pruuRepository.deleteById(id);
     }
 }
